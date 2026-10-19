@@ -105,6 +105,23 @@ button:active {
 </div>
 
 <script>
+let selectedVoice = null;
+
+function loadVoices() {
+    const voices = speechSynthesis.getVoices();
+
+    selectedVoice =
+        voices.find(v => /Google UK English Male/i.test(v.name)) ||
+        voices.find(v => /Microsoft.*David/i.test(v.name)) ||
+        voices.find(v => /male/i.test(v.name) && /en/i.test(v.lang)) ||
+        voices.find(v => v.lang === "en-US") ||
+        voices.find(v => v.lang.startsWith("en")) ||
+        null;
+}
+
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
 function speak(text) {
     if (!("speechSynthesis" in window)) {
         document.getElementById("status").innerText =
@@ -115,12 +132,26 @@ function speak(text) {
     speechSynthesis.cancel();
 
     const message = new SpeechSynthesisUtterance(text);
-    message.lang = "en-IN";
-    message.rate = 0.95;
+    message.lang = "en-US";
+    message.rate = 0.88;
+    message.pitch = 0.85;
+    message.volume = 1;
+
+    if (selectedVoice) {
+        message.voice = selectedVoice;
+    }
+
+    message.onend = function() {
+        document.getElementById("status").innerText = "SYSTEM ONLINE";
+    };
+
+    message.onerror = function() {
+        document.getElementById("status").innerText =
+            "Voice playback interrupted. Try again.";
+    };
 
     speechSynthesis.speak(message);
-
-    document.getElementById("status").innerText = text;
+    document.getElementById("status").innerText = "JARVIS SPEAKING...";
 }
 
 function greet() {
