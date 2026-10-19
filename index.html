@@ -2,213 +2,622 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JARVIS AI</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#030814">
+<title>JARVIS</title>
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    background: #030712;
-    color: #00eaff;
-    font-family: Arial, sans-serif;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-.container {
-    width: 90%;
-    max-width: 420px;
-}
-
-h1 {
-    letter-spacing: 10px;
-    font-size: 38px;
-    text-shadow: 0 0 20px #00eaff;
-}
-
-p {
-    color: #91a8c4;
-    margin: 15px 0 35px;
-}
-
-.orb {
-    width: 190px;
-    height: 190px;
-    border: 3px solid #00eaff;
-    border-radius: 50%;
-    margin: 30px auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 55px;
-    box-shadow: 0 0 25px #00eaff,
-                inset 0 0 25px #00eaff;
-    animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-    50% {
-        box-shadow: 0 0 45px #00eaff,
-                    inset 0 0 40px #00eaff;
-    }
-}
-
-button {
-    display: block;
-    width: 100%;
-    padding: 15px;
-    margin: 14px 0;
-    border: 1px solid #00eaff;
-    background: transparent;
-    color: #00eaff;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-button:active {
-    background: #003b4a;
-}
-
-#status {
-    margin-top: 25px;
-    color: #fff;
-    font-size: 14px;
-}
+:root{--bg:#030814;--panel:rgba(8,24,52,.72);--line:rgba(0,200,255,.25);--cyan:#00e5ff;--blue:#2979ff;--text:#d8f6ff;--dim:#7da3bb;--err:#ff6b87;--ok:#47e5a0}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{background:radial-gradient(ellipse at 50% -10%,#0b2250 0%,#030814 62%) fixed;color:var(--text);font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);background-size:44px 44px}
+.app{position:relative;max-width:1100px;margin:0 auto;padding:14px;display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:860px){.app{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.span2{grid-column:1/-1}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;backdrop-filter:blur(8px);box-shadow:0 0 30px rgba(0,150,255,.08) inset}
+header.card{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.brand{font-size:1.3rem;letter-spacing:.35em;font-weight:300;color:var(--cyan);text-shadow:0 0 12px rgba(0,229,255,.7)}
+#greeting{color:var(--dim);font-size:.9rem;margin-top:4px}
+.right{text-align:right}
+#clock{font-size:1.6rem;font-weight:200;letter-spacing:.08em;font-variant-numeric:tabular-nums}
+#date{color:var(--dim);font-size:.8rem}
+#status{display:inline-flex;align-items:center;gap:8px;margin-top:6px;padding:4px 12px;border:1px solid var(--line);border-radius:999px;font-size:.72rem;letter-spacing:.2em;color:var(--cyan)}
+#status i{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+body[data-state=listening] #status i{background:#ff5c7a;box-shadow:0 0 8px #ff5c7a}
+body[data-state=thinking] #status i{background:#ffd54f;box-shadow:0 0 8px #ffd54f}
+body[data-state=speaking] #status i{background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.stage{display:flex;flex-direction:column;align-items:center;gap:14px}
+.orb{position:relative;width:min(62vw,250px);aspect-ratio:1;display:grid;place-items:center}
+.ring{position:absolute;border-radius:50%;border:1px solid rgba(0,229,255,.35)}
+.r1{inset:0;border-style:dashed;animation:spin 24s linear infinite}
+.r2{inset:9%;border-color:rgba(41,121,255,.55);border-top-color:transparent;border-bottom-color:transparent;animation:spin 9s linear infinite reverse}
+.r3{inset:18%;border-color:rgba(0,229,255,.22);border-left-color:var(--cyan);animation:spin 5s linear infinite}
+.core{width:50%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e6fdff 0%,#4df0ff 22%,#1e6bff 62%,#06194a 100%);box-shadow:0 0 40px 8px rgba(0,229,255,.55),0 0 90px 20px rgba(41,121,255,.35);animation:breathe 4s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes breathe{50%{transform:scale(1.05)}}
+@keyframes pulse{50%{transform:scale(1.14)}}
+body[data-state=listening] .core{animation:pulse 1s ease-in-out infinite;background:radial-gradient(circle at 35% 30%,#fff 0%,#7dfcff 25%,#00b8ff 62%,#04264d 100%)}
+body[data-state=thinking] .r3{animation-duration:1.2s}
+body[data-state=thinking] .r2{animation-duration:2.5s}
+body[data-state=thinking] .core{animation:pulse .6s ease-in-out infinite}
+body[data-state=speaking] .core{animation:pulse .45s ease-in-out infinite}
+.wave{display:flex;align-items:center;justify-content:center;gap:3px;height:44px;width:100%}
+.wave span{width:4px;height:100%;border-radius:2px;background:linear-gradient(var(--cyan),var(--blue));transform:scaleY(.08);opacity:.7}
+body[data-state=listening] .wave span,body[data-state=speaking] .wave span{animation:wave .8s ease-in-out infinite alternate}
+@keyframes wave{from{transform:scaleY(.12)}to{transform:scaleY(var(--h,1))}}
+.hint{color:var(--dim);font-size:.88rem;text-align:center;min-height:2.6em}
+.controls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.btn{background:rgba(0,229,255,.08);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:11px 16px;font-size:.95rem;cursor:pointer;transition:.2s}
+.btn:hover{background:rgba(0,229,255,.18);box-shadow:0 0 14px rgba(0,229,255,.3)}
+.btn.primary{background:linear-gradient(135deg,rgba(0,229,255,.28),rgba(41,121,255,.35))}
+.btn.active{background:rgba(255,92,122,.3);border-color:#ff5c7a}
+.btn.small{padding:7px 12px;font-size:.82rem}
+.chathead{display:flex;justify-content:space-between;align-items:center;color:var(--cyan);font-size:.75rem;letter-spacing:.25em}
+.chat{height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:6px 2px;margin:10px 0}
+.msg{max-width:88%;padding:9px 12px;border-radius:12px;font-size:.93rem;line-height:1.45;white-space:pre-wrap;word-wrap:break-word;border:1px solid var(--line)}
+.msg.user{align-self:flex-end;background:rgba(41,121,255,.25)}
+.msg.jarvis{align-self:flex-start;background:rgba(0,229,255,.08)}
+.msg.sys{align-self:center;color:var(--dim);font-size:.82rem;text-align:center;border-style:dashed}
+.msg.err{align-self:center;color:var(--err);border-color:rgba(255,107,135,.5);font-size:.85rem}
+.msg.typing{opacity:.7;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.25}}
+.msg a{display:block;margin-top:6px;color:var(--cyan)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+input[type=text],input[type=url],select{flex:1;min-width:0;width:100%;background:rgba(0,0,0,.35);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px}
+form.row input{flex:1}
+.note{color:var(--dim);font-size:.78rem;margin-top:8px;line-height:1.4}
+#settings h2{font-size:.8rem;letter-spacing:.25em;color:var(--cyan);font-weight:400;margin-bottom:12px}
+.grid{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:860px){.grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+label{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--dim)}
+label.check{flex-direction:row;align-items:center;gap:10px}
+input[type=range]{width:100%}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 </style>
 </head>
+<body data-state="online">
+<div class="app">
 
-<body>
-<div class="container">
+  <header class="card span2">
+    <div>
+      <div class="brand">J.A.R.V.I.S</div>
+      <div id="greeting">Hello.</div>
+    </div>
+    <div class="right">
+      <div id="clock">--:--:--</div>
+      <div id="date"></div>
+      <div id="status"><i></i><span id="statusText">SYSTEM ONLINE</span></div>
+    </div>
+  </header>
 
-    <h1>J.A.R.V.I.S.</h1>
-    <p>PERSONAL AI ASSISTANT</p>
+  <section class="card stage" aria-label="JARVIS core">
+    <div class="orb" aria-hidden="true">
+      <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+      <div class="core"></div>
+    </div>
+    <div class="wave" id="wave" aria-hidden="true"></div>
+    <div id="hint" class="hint" aria-live="polite">Tap Speak and talk, or type a message.</div>
+    <div class="controls">
+      <button id="micBtn" class="btn primary" type="button">🎤 Speak</button>
+      <button id="greetBtn" class="btn" type="button">👋 Greet</button>
+      <button id="stopBtn" class="btn" type="button">⏹ Stop</button>
+      <button id="settingsBtn" class="btn" type="button" aria-expanded="false">⚙ Settings</button>
+    </div>
+  </section>
 
-    <div class="orb">◈</div>
+  <section class="card" aria-label="Conversation">
+    <div class="chathead"><span>CONVERSATION</span><button id="clearBtn" class="btn small" type="button">Clear</button></div>
+    <div id="chat" class="chat" aria-live="polite"></div>
+    <form id="form" class="row" autocomplete="off">
+      <input id="input" type="text" placeholder="Type a message…" maxlength="1000" aria-label="Type a message">
+      <button class="btn primary" type="submit">Send</button>
+    </form>
+    <div class="note">Memory: this session only. Refreshing the page or pressing Clear erases the chat.</div>
+  </section>
 
-    <button onclick="greet()">🔊 GOOD EVENING</button>
-
-    <button onclick="listen()">🎙️ TALK TO JARVIS</button>
-
-    <button onclick="openYouTube()">▶ OPEN YOUTUBE</button>
-
-    <div id="status">SYSTEM ONLINE</div>
+  <section class="card span2" id="settings" hidden>
+    <h2>SETTINGS</h2>
+    <div class="grid">
+      <div>
+        <label>AI Worker URL
+          <input id="workerUrl" type="url" placeholder="https://jarvis-brain.yourname.workers.dev">
+        </label>
+        <div class="row" style="margin-top:8px">
+          <button id="saveUrlBtn" class="btn small" type="button">Save URL</button>
+          <button id="testAiBtn" class="btn small" type="button">Test AI</button>
+        </div>
+        <div id="aiStatus" class="note"></div>
+      </div>
+      <div>
+        <label>Voice
+          <select id="voiceSel"></select>
+        </label>
+        <div id="voiceNote" class="note"></div>
+        <div class="row" style="margin-top:8px">
+          <button id="testVoiceBtn" class="btn small" type="button">Test voice</button>
+        </div>
+      </div>
+      <label>Speed <span id="rateVal"></span>
+        <input id="rate" type="range" min="0.7" max="1.3" step="0.05">
+      </label>
+      <label>Pitch <span id="pitchVal"></span>
+        <input id="pitch" type="range" min="0.5" max="1.3" step="0.05">
+      </label>
+      <label>Listening language
+        <select id="langSel">
+          <option value="en-IN">English (India)</option>
+          <option value="en-GB">English (UK)</option>
+          <option value="en-US">English (US)</option>
+          <option value="hi-IN">Hindi</option>
+        </select>
+      </label>
+      <label class="check"><input id="speakToggle" type="checkbox"> Speak replies aloud</label>
+    </div>
+    <div class="note">Your prompts are sent to your Worker and then to Google's Gemini service. Do not share private information. The orb and bars animate by state; they do not measure real sound.</div>
+  </section>
 
 </div>
 
 <script>
-let selectedVoice = null;
+(function () {
+  'use strict';
 
-function loadVoices() {
-    const voices = speechSynthesis.getVoices();
+  var $ = function (id) { return document.getElementById(id); };
+  var el = {
+    clock: $('clock'), date: $('date'), greeting: $('greeting'), statusText: $('statusText'),
+    hint: $('hint'), chat: $('chat'), form: $('form'), input: $('input'), wave: $('wave'),
+    micBtn: $('micBtn'), greetBtn: $('greetBtn'), stopBtn: $('stopBtn'), settingsBtn: $('settingsBtn'),
+    clearBtn: $('clearBtn'), settings: $('settings'), workerUrl: $('workerUrl'),
+    saveUrlBtn: $('saveUrlBtn'), testAiBtn: $('testAiBtn'), aiStatus: $('aiStatus'),
+    voiceSel: $('voiceSel'), voiceNote: $('voiceNote'), testVoiceBtn: $('testVoiceBtn'),
+    rate: $('rate'), rateVal: $('rateVal'), pitch: $('pitch'), pitchVal: $('pitchVal'),
+    langSel: $('langSel'), speakToggle: $('speakToggle')
+  };
 
-    selectedVoice =
-        voices.find(v => /Google UK English Male/i.test(v.name)) ||
-        voices.find(v => /Microsoft.*David/i.test(v.name)) ||
-        voices.find(v => /male/i.test(v.name) && /en/i.test(v.lang)) ||
-        voices.find(v => v.lang === "en-US") ||
-        voices.find(v => v.lang.startsWith("en")) ||
-        null;
-}
+  var synthOK = 'speechSynthesis' in window;
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-speechSynthesis.onvoiceschanged = loadVoices;
-loadVoices();
+  /* ---------- storage (settings only, never the chat) ---------- */
+  var store = {
+    get: function (k, d) { try { var v = localStorage.getItem('jarvis_' + k); return v === null ? d : v; } catch (e) { return d; } },
+    set: function (k, v) { try { localStorage.setItem('jarvis_' + k, v); } catch (e) {} }
+  };
 
-function speak(text) {
-    if (!("speechSynthesis" in window)) {
-        document.getElementById("status").innerText =
-            "Speech is not supported in this browser.";
-        return;
+  /* ---------- state ---------- */
+  var LABELS = { online: 'SYSTEM ONLINE', listening: 'LISTENING', thinking: 'THINKING', speaking: 'SPEAKING' };
+  var state = 'online';
+  var history = [];
+  var busy = false;
+  var convo = 0;
+  var aiController = null;
+  var userAborted = false;
+  var rec = null, listening = false, ignoreResult = false;
+  var voices = [];
+  var speakToken = 0;
+  var utterKeep = [];
+
+  function setState(s) {
+    state = s;
+    document.body.setAttribute('data-state', s);
+    el.statusText.textContent = LABELS[s] || LABELS.online;
+  }
+
+  /* ---------- chat ---------- */
+  function addMsg(role, text, link) {
+    var d = document.createElement('div');
+    d.className = 'msg ' + role;
+    var p = document.createElement('div');
+    p.textContent = text;
+    d.appendChild(p);
+    if (link) {
+      var a = document.createElement('a');
+      a.href = link.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.textContent = link.label;
+      d.appendChild(a);
     }
+    el.chat.appendChild(d);
+    el.chat.scrollTop = el.chat.scrollHeight;
+    return d;
+  }
 
-    speechSynthesis.cancel();
+  /* ---------- clock and greeting ---------- */
+  function timeGreeting() {
+    var h = new Date().getHours();
+    if (h >= 5 && h < 12) return 'Good morning';
+    if (h >= 12 && h < 17) return 'Good afternoon';
+    return 'Good evening';
+  }
+  function tick() {
+    var d = new Date();
+    el.clock.textContent = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    el.date.textContent = d.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  }
+  function updateGreeting() { el.greeting.textContent = timeGreeting() + '.'; }
 
-    const message = new SpeechSynthesisUtterance(text);
-    message.lang = "en-US";
-    message.rate = 0.88;
-    message.pitch = 0.85;
-    message.volume = 1;
+  /* ---------- voices ---------- */
+  var MALE_HINTS = ['daniel', 'george', 'ryan', 'guy', 'david', 'mark', 'james', 'alex', 'arthur', 'oliver', 'thomas', 'fred', 'ravi', 'rishi', 'liam', 'brian'];
+  var FEMALE_HINTS = ['samantha', 'susan', 'hazel', 'libby', 'sonia', 'zira', 'karen', 'victoria', 'moira', 'fiona', 'kate', 'serena', 'tessa', 'heera', 'neerja', 'jenny', 'aria', 'emma', 'amy'];
 
-    if (selectedVoice) {
-        message.voice = selectedVoice;
+  function looksMale(n) {
+    n = (n || '').toLowerCase();
+    if (/\bfemale\b/.test(n)) return false;
+    if (/\bmale\b/.test(n)) return true;
+    return MALE_HINTS.some(function (h) { return n.indexOf(h) !== -1; });
+  }
+  function looksFemale(n) {
+    n = (n || '').toLowerCase();
+    if (/\bfemale\b/.test(n)) return true;
+    return FEMALE_HINTS.some(function (h) { return n.indexOf(h) !== -1; });
+  }
+  function scoreVoice(v) {
+    var l = (v.lang || '').toLowerCase().replace('_', '-');
+    var n = v.name || '';
+    var s = 0;
+    if (l.indexOf('en') !== 0) return -100;
+    if (l === 'en-gb') s += 30; else if (l === 'en-in') s += 15; else if (l === 'en-au') s += 10; else if (l === 'en-us') s += 8;
+    if (looksMale(n)) s += 40;
+    if (looksFemale(n)) s -= 60;
+    if (v.localService) s += 3;
+    return s;
+  }
+  function pickVoice() {
+    if (!voices.length) return { voice: null, male: false };
+    var saved = store.get('voice', 'auto');
+    if (saved !== 'auto') {
+      for (var i = 0; i < voices.length; i++) {
+        if (voices[i].name === saved) return { voice: voices[i], male: looksMale(saved), manual: true };
+      }
     }
-
-    message.onend = function() {
-        document.getElementById("status").innerText = "SYSTEM ONLINE";
-    };
-
-    message.onerror = function() {
-        document.getElementById("status").innerText =
-            "Voice playback interrupted. Try again.";
-    };
-
-    speechSynthesis.speak(message);
-    document.getElementById("status").innerText = "JARVIS SPEAKING...";
-}
-
-function greet() {
-    const hour = new Date().getHours();
-    let greeting;
-
-    if (hour < 12) {
-        greeting = "Good morning";
-    } else if (hour < 17) {
-        greeting = "Good afternoon";
+    var best = null, bestScore = -1000;
+    voices.forEach(function (v) { var sc = scoreVoice(v); if (sc > bestScore) { bestScore = sc; best = v; } });
+    if (!best || bestScore <= -100) return { voice: voices[0], male: false };
+    return { voice: best, male: looksMale(best.name) };
+  }
+  function updateVoiceNote() {
+    if (!synthOK) { el.voiceNote.textContent = 'Voice output is not supported in this browser. Replies will appear as text only.'; return; }
+    if (!voices.length) { el.voiceNote.textContent = 'No voices found yet. Your browser may load them in a moment, or none are installed.'; return; }
+    var p = pickVoice();
+    if (p.manual) { el.voiceNote.textContent = 'Using your chosen voice: ' + p.voice.name + '.'; return; }
+    if (p.male) {
+      el.voiceNote.textContent = 'Using ' + p.voice.name + ' (' + p.voice.lang + '). Its name suggests a male voice, but browsers do not confirm gender.';
     } else {
-        greeting = "Good evening";
+      el.voiceNote.textContent = 'No voice clearly identified as male was found on this device. Using the best available: ' + p.voice.name + ' (' + p.voice.lang + '). You can pick another voice from the list.';
+    }
+  }
+  function populateVoices() {
+    if (!synthOK) { updateVoiceNote(); return; }
+    voices = speechSynthesis.getVoices() || [];
+    var saved = store.get('voice', 'auto');
+    el.voiceSel.innerHTML = '';
+    el.voiceSel.add(new Option('Auto (best available)', 'auto'));
+    voices.slice().sort(function (a, b) { return scoreVoice(b) - scoreVoice(a); }).forEach(function (v) {
+      el.voiceSel.add(new Option(v.name + ' (' + v.lang + ')', v.name));
+    });
+    el.voiceSel.value = saved;
+    if (el.voiceSel.value !== saved) el.voiceSel.value = 'auto';
+    updateVoiceNote();
+  }
+
+  /* ---------- speaking ---------- */
+  function stopSpeaking() {
+    speakToken++;
+    utterKeep = [];
+    if (synthOK) { try { speechSynthesis.cancel(); } catch (e) {} }
+    if (state === 'speaking') setState('online');
+  }
+  function splitText(t) {
+    var parts = t.replace(/\s+/g, ' ').match(/[^.!?।\n]+[.!?।]*\s*/g) || [t];
+    var out = [], cur = '';
+    parts.forEach(function (p) {
+      if ((cur + p).length > 180 && cur) { out.push(cur); cur = p; } else { cur += p; }
+    });
+    if (cur.trim()) out.push(cur);
+    return out;
+  }
+  function speak(text) {
+    if (!synthOK || !text) return;
+    stopSpeaking();
+    var token = speakToken;
+    var chunks = splitText(text);
+    var choice = pickVoice();
+    var voice = choice.voice;
+    if (/[\u0900-\u097F]/.test(text)) {
+      for (var i = 0; i < voices.length; i++) { if (/^hi/i.test(voices[i].lang)) { voice = voices[i]; break; } }
+    }
+    var rate = parseFloat(store.get('rate', '0.95'));
+    var pitch = parseFloat(store.get('pitch', '0.9'));
+    setState('speaking');
+    var idx = 0;
+    function next() {
+      if (token !== speakToken) return;
+      if (idx >= chunks.length) { utterKeep = []; if (state === 'speaking') setState('online'); return; }
+      var u = new SpeechSynthesisUtterance(chunks[idx++]);
+      if (voice) { u.voice = voice; u.lang = voice.lang; } else { u.lang = 'en-GB'; }
+      u.rate = rate; u.pitch = pitch;
+      u.onend = next;
+      u.onerror = function (e) {
+        if (token !== speakToken) return;
+        if (e && (e.error === 'interrupted' || e.error === 'canceled')) return;
+        next();
+      };
+      utterKeep.push(u);
+      speechSynthesis.speak(u);
+    }
+    setTimeout(function () { if (token === speakToken) next(); }, 80);
+  }
+  function speakIfOn(text) { if (el.speakToggle.checked) speak(text); }
+
+  /* ---------- local commands ---------- */
+  var TIME_RE = /^(?:what(?:'s| is)? (?:the )?(?:current )?time(?: is it)?(?: now)?|what time is it(?: now)?|(?:tell|give) me (?:the )?(?:current )?time|current time|time please|time kya (?:hai|hua hai)|kitne baje (?:hain?|hue hain?))$/;
+  var DATE_RE = /^(?:what(?:'s| is)? (?:the )?(?:today's |todays )?date(?: today)?|what day is (?:it|today)|(?:tell|give) me (?:the |today's )?(?:current )?date|today's date|current date|aaj (?:ki )?(?:date|tarikh)(?: kya hai)?|aaj kaun sa din hai)$/;
+  var BOTH_RE = /(?:time and date|date and time)/;
+  var YT_RE = /^(?:please )?(?:open|launch|start|go to) (?:the )?youtube(?: please)?$|^youtube (?:kholo|khol do|open karo|chalu karo)$/;
+  var GOOGLE_RE = /^(?:please )?(?:open|launch|start|go to) (?:the )?google(?: please)?$|^google (?:kholo|khol do|open karo|chalu karo)$/;
+  var GREET_RE = /^(?:hi|hello|hey|hii+|namaste|namaskar|good (?:morning|afternoon|evening))(?: jarvis)?$|^jarvis$/;
+  var STOP_RE = /^(?:stop|stop talking|be quiet|quiet|chup|chup ho ja(?:o|a))$/;
+
+  function openSite(name, url) {
+    try { window.open(url, '_blank', 'noopener'); } catch (e) {}
+    return { reply: 'Opening ' + name + '. If nothing opened, tap the link below.', link: { url: url, label: 'Open ' + name } };
+  }
+  function localCommand(raw) {
+    var s = raw.toLowerCase().replace(/[\u2018\u2019]/g, "'").trim();
+    s = s.replace(/^(?:hey|hi|ok|okay)[,\s]+jarvis[,.\s]*/, '').replace(/[.!?,]+$/, '').trim();
+    var now = new Date();
+    var t = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    var d = now.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    if (s === '' || GREET_RE.test(s)) return { reply: timeGreeting() + '. How can I help?' };
+    if (STOP_RE.test(s)) { stopSpeaking(); return { reply: 'Stopped.', silent: true }; }
+    if (BOTH_RE.test(s)) return { reply: 'It is ' + t + ' on ' + d + '.' };
+    if (TIME_RE.test(s)) return { reply: 'It is ' + t + '.' };
+    if (DATE_RE.test(s)) return { reply: 'Today is ' + d + '.' };
+    if (YT_RE.test(s)) return openSite('YouTube', 'https://www.youtube.com');
+    if (GOOGLE_RE.test(s)) return openSite('Google', 'https://www.google.com');
+    return null;
+  }
+
+  /* ---------- AI ---------- */
+  function getUrl() { return (store.get('url', '') || '').trim(); }
+
+  async function callWorker(messages) {
+    var url = getUrl();
+    if (!url) return { ok: false, error: 'AI is not set up yet. Open Settings, paste your Worker URL, and press Save URL. Built-in commands still work.' };
+    aiController = new AbortController();
+    userAborted = false;
+    var timer = setTimeout(function () { if (aiController) aiController.abort(); }, 30000);
+    try {
+      var res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: messages }),
+        signal: aiController.signal
+      });
+      var data = null;
+      try { data = await res.json(); } catch (e) {}
+      if (!res.ok || !data || !data.reply) {
+        return { ok: false, error: (data && data.error) || ('The AI service returned an error (HTTP ' + res.status + ').') };
+      }
+      return { ok: true, reply: String(data.reply) };
+    } catch (e) {
+      if (e && e.name === 'AbortError') {
+        return userAborted ? { ok: false, cancelled: true, error: 'Cancelled.' } : { ok: false, error: 'The AI service took too long to answer. Please try again.' };
+      }
+      return { ok: false, error: 'Could not reach the AI service. Check your internet connection and the Worker URL in Settings.' };
+    } finally {
+      clearTimeout(timer);
+      aiController = null;
+    }
+  }
+
+  function updateAiStatus(text) {
+    if (text) { el.aiStatus.textContent = text; return; }
+    el.aiStatus.textContent = getUrl() ? 'AI: URL saved. Press Test AI to check the connection.' : 'AI: not set up. Only built-in commands work.';
+  }
+
+  async function handleInput(text) {
+    text = (text || '').trim();
+    if (!text) return;
+    if (busy) { addMsg('sys', 'One moment, I am still working on your last message.'); return; }
+    stopSpeaking();
+    addMsg('user', text);
+
+    var local = localCommand(text);
+    if (local) {
+      history.push({ role: 'user', text: text });
+      history.push({ role: 'model', text: local.reply });
+      addMsg('jarvis', local.reply, local.link);
+      if (!local.silent) speakIfOn(local.reply);
+      el.hint.textContent = 'Ready.';
+      return;
     }
 
-    speak(greeting + ", boss. JARVIS is online. How may I assist you?");
-}
-
-function listen() {
-    const Recognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition;
-
-    if (!Recognition) {
-        document.getElementById("status").innerText =
-            "Voice recognition is not supported here.";
-        return;
+    history.push({ role: 'user', text: text });
+    busy = true;
+    setState('thinking');
+    el.hint.textContent = 'Thinking…';
+    var myConvo = convo;
+    var typing = addMsg('jarvis typing', '…');
+    var r = await callWorker(history.slice(-20));
+    typing.remove();
+    if (myConvo !== convo) return;
+    busy = false;
+    if (r.ok) {
+      history.push({ role: 'model', text: r.reply });
+      addMsg('jarvis', r.reply);
+      setState('online');
+      el.hint.textContent = 'Ready.';
+      speakIfOn(r.reply);
+    } else {
+      history.pop();
+      addMsg(r.cancelled ? 'sys' : 'err', r.error);
+      setState('online');
+      el.hint.textContent = r.cancelled ? 'Cancelled.' : 'Something went wrong. See the message in the chat.';
     }
+  }
 
-    const recognition = new Recognition();
-    recognition.lang = "en-IN";
-    recognition.interimResults = false;
-
-    document.getElementById("status").innerText =
-        "Listening...";
-
-    recognition.onresult = function(event) {
-        const text = event.results[0][0].transcript;
-
-        document.getElementById("status").innerText =
-            "You said: " + text;
-
-        speak("I heard you say " + text +
-              ". My AI brain will be connected in a later step.");
+  /* ---------- listening ---------- */
+  function stopListening() {
+    if (rec && listening) { ignoreResult = true; try { rec.abort(); } catch (e) {} }
+  }
+  function startListening() {
+    if (!SR) {
+      addMsg('sys', 'Voice input is not supported in this browser. Please type your message, or use Chrome on Android or desktop.');
+      el.input.focus();
+      return;
+    }
+    if (listening) { try { rec.stop(); } catch (e) {} return; }
+    if (busy) { addMsg('sys', 'One moment, I am still working on your last message.'); return; }
+    stopSpeaking();
+    var finalText = '';
+    var errorShown = false;
+    ignoreResult = false;
+    rec = new SR();
+    rec.lang = store.get('lang', 'en-IN');
+    rec.interimResults = true;
+    rec.continuous = false;
+    rec.maxAlternatives = 1;
+    rec.onstart = function () {
+      listening = true;
+      setState('listening');
+      el.micBtn.classList.add('active');
+      el.micBtn.textContent = '🎤 Listening…';
+      el.hint.textContent = 'Listening… speak now.';
     };
-
-    recognition.onerror = function() {
-        document.getElementById("status").innerText =
-            "Could not hear you. Check microphone permission.";
+    rec.onresult = function (ev) {
+      var interim = '';
+      for (var i = ev.resultIndex; i < ev.results.length; i++) {
+        var r = ev.results[i];
+        if (r.isFinal) finalText += r[0].transcript; else interim += r[0].transcript;
+      }
+      el.hint.textContent = (finalText + interim) || 'Listening…';
     };
+    rec.onerror = function (ev) {
+      var code = ev && ev.error;
+      if (code === 'aborted') return;
+      errorShown = true;
+      var msg;
+      if (code === 'not-allowed' || code === 'service-not-allowed') msg = 'Microphone permission is blocked. Allow the microphone for this site in your browser settings, then try again. You can also type your message.';
+      else if (code === 'no-speech') msg = 'I did not hear anything. Tap Speak and try again.';
+      else if (code === 'audio-capture') msg = 'No microphone was found on this device.';
+      else if (code === 'network') msg = 'Speech recognition needs an internet connection and could not connect.';
+      else msg = 'Voice input error: ' + code;
+      addMsg('err', msg);
+    };
+    rec.onend = function () {
+      listening = false;
+      el.micBtn.classList.remove('active');
+      el.micBtn.textContent = '🎤 Speak';
+      if (state === 'listening') setState('online');
+      var t = finalText.trim();
+      if (ignoreResult) { el.hint.textContent = 'Ready.'; return; }
+      if (t) { handleInput(t); }
+      else {
+        el.hint.textContent = errorShown ? 'Voice input failed. You can type instead.' : 'I did not catch that. Tap Speak and try again.';
+      }
+    };
+    try { rec.start(); }
+    catch (e) { addMsg('err', 'Could not start the microphone. Please try again.'); }
+  }
 
-    recognition.start();
-}
+  /* ---------- buttons ---------- */
+  function greet() {
+    stopListening();
+    var msg = timeGreeting() + '. JARVIS at your service.';
+    addMsg('jarvis', msg);
+    speak(msg);
+  }
+  function stopAll() {
+    stopSpeaking();
+    stopListening();
+    if (aiController) { userAborted = true; aiController.abort(); }
+    if (state !== 'thinking') setState('online');
+    el.hint.textContent = 'Stopped.';
+  }
+  function clearAll() {
+    stopAll();
+    convo++;
+    busy = false;
+    history = [];
+    el.chat.innerHTML = '';
+    setState('online');
+    addMsg('sys', 'Conversation cleared.');
+    el.hint.textContent = 'Ready.';
+  }
+  function saveUrl() {
+    var v = (el.workerUrl.value || '').trim();
+    if (v && v.indexOf('https://') !== 0) { updateAiStatus('The URL must start with https://'); return false; }
+    store.set('url', v);
+    updateAiStatus();
+    return true;
+  }
+  async function testAi() {
+    if (!saveUrl()) return;
+    if (!getUrl()) return;
+    if (busy) { updateAiStatus('Please wait, JARVIS is busy.'); return; }
+    busy = true;
+    updateAiStatus('Testing the AI connection…');
+    var r = await callWorker([{ role: 'user', text: 'Reply with the single word: ready' }]);
+    busy = false;
+    updateAiStatus(r.ok ? 'AI: connected ✔ The service answered.' : 'AI test failed: ' + r.error);
+  }
 
-function openYouTube() {
-    window.open("https://www.youtube.com/", "_blank");
-}
+  /* ---------- init ---------- */
+  function init() {
+    for (var i = 0; i < 28; i++) {
+      var s = document.createElement('span');
+      s.style.setProperty('--h', (0.25 + Math.random() * 0.75).toFixed(2));
+      s.style.animationDelay = (-Math.random() * 0.8).toFixed(2) + 's';
+      s.style.animationDuration = (0.5 + Math.random() * 0.6).toFixed(2) + 's';
+      el.wave.appendChild(s);
+    }
+    el.rate.value = store.get('rate', '0.95');
+    el.pitch.value = store.get('pitch', '0.9');
+    el.rateVal.textContent = el.rate.value;
+    el.pitchVal.textContent = el.pitch.value;
+    el.langSel.value = store.get('lang', 'en-IN');
+    el.speakToggle.checked = store.get('speak', '1') === '1';
+    el.workerUrl.value = getUrl();
+
+    tick(); setInterval(tick, 1000);
+    updateGreeting(); setInterval(updateGreeting, 60000);
+
+    if (synthOK) {
+      populateVoices();
+      speechSynthesis.onvoiceschanged = populateVoices;
+    } else {
+      updateVoiceNote();
+    }
+    updateAiStatus();
+
+    el.micBtn.addEventListener('click', startListening);
+    el.greetBtn.addEventListener('click', greet);
+    el.stopBtn.addEventListener('click', stopAll);
+    el.clearBtn.addEventListener('click', clearAll);
+    el.settingsBtn.addEventListener('click', function () {
+      el.settings.hidden = !el.settings.hidden;
+      el.settingsBtn.setAttribute('aria-expanded', String(!el.settings.hidden));
+    });
+    el.form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var v = el.input.value;
+      el.input.value = '';
+      handleInput(v);
+    });
+    el.saveUrlBtn.addEventListener('click', saveUrl);
+    el.testAiBtn.addEventListener('click', testAi);
+    el.voiceSel.addEventListener('change', function () { store.set('voice', el.voiceSel.value); updateVoiceNote(); });
+    el.rate.addEventListener('input', function () { store.set('rate', el.rate.value); el.rateVal.textContent = el.rate.value; });
+    el.pitch.addEventListener('input', function () { store.set('pitch', el.pitch.value); el.pitchVal.textContent = el.pitch.value; });
+    el.langSel.addEventListener('change', function () { store.set('lang', el.langSel.value); });
+    el.speakToggle.addEventListener('change', function () { store.set('speak', el.speakToggle.checked ? '1' : '0'); if (!el.speakToggle.checked) stopSpeaking(); });
+    el.testVoiceBtn.addEventListener('click', function () { speak(timeGreeting() + '. This is how I sound.'); });
+
+    addMsg('sys', 'JARVIS online. Built-in commands work now. For intelligent answers, finish the AI setup in Settings.');
+    if (!SR) addMsg('sys', 'Note: this browser does not support voice input. You can still type.');
+    if (!synthOK) addMsg('sys', 'Note: this browser does not support spoken replies. Replies will show as text.');
+  }
+
+  init();
+})();
 </script>
-
 </body>
 </html>
